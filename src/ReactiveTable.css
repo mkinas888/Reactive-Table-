@@ -1,0 +1,30 @@
+body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto; }
+  body .wrapper {
+    max-width: 800px; }
+    body .wrapper .items {
+      font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+      table-layout: fixed;
+      white-space: nowrap; }
+    body .wrapper .items td .items th {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border: 1px solid #ddd;
+      padding: 8px; }
+    body .wrapper .items tr:nth-child(even) {
+      background-color: #f2f2f2; }
+    body .wrapper .items tr:hover {
+      background-color: #ddd; }
+    body .wrapper .items th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #4CAF50;
+      color: white; }

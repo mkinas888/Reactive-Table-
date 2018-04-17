@@ -1,0 +1,12 @@
+[
+  {
+    "label": "Imie",
+    "key": "name",
+    "type": "string"
+  },
+  {
+    "label": "Wiek",
+    "key": "age",
+    "type": "number"
+  }
+]
