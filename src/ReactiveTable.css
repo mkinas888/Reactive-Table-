@@ -6,6 +6,10 @@ body {
   margin: auto; }
   body .wrapper {
     max-width: 800px; }
+    body .wrapper button {
+      cursor: pointer; }
+    body .wrapper a {
+      text-decoration: none; }
     body .wrapper .items {
       font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
       border-collapse: collapse;
@@ -23,6 +27,7 @@ body {
     body .wrapper .items tr:hover {
       background-color: #ddd; }
     body .wrapper .items th {
+      cursor: pointer;
       padding-top: 12px;
       padding-bottom: 12px;
       text-align: left;
