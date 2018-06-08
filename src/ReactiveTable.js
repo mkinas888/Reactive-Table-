@@ -28,16 +28,25 @@ class ReactiveTable extends Component {
 
   filterData = (key, event) => {
     let tmpData;
+    let type = this.props.columnNames.find(item => item.key == key)["type"];
     if(this.state.filteredColumnChange === '' || this.state.filteredColumnChange === key){
       tmpData = this.state.currentDataSet;
     } else{
       tmpData = this.state.filteredDataSet;
     }
-    tmpData = tmpData.filter((item) => {
-        if(item[key].toLowerCase().includes(event.target.value)) {
+    if(type === 'string') {
+      tmpData = tmpData.filter((item) => {
+          if(item[key].toLowerCase().includes(event.target.value)) {
+            return  item[key];
+          }
+      });
+    } else {
+      tmpData = tmpData.filter((item) => {
+        if(item[key].toString().match(event.target.value.toString()) !== null) {
           return  item[key];
         }
     });
+    }
     this.setState({filteredColumn: key});
     this.setState({filteredDataSet: tmpData});
     this.setState({sortedDataSet: tmpData});

@@ -28,11 +28,12 @@ body {
       text-overflow: ellipsis;
       border: 1px solid #ddd;
       padding: 8px;
+      transition: all 0.3s;
     }
     .items tr:nth-child(even) {
       background-color: #f2f2f2;
     }
-    .items tr:hover {
+    .items td:hover {
       background-color: #ddd;
     }
     .items th {
@@ -45,3 +46,4 @@ body {
     }
   }
 }
+
