@@ -4,4 +4,4 @@ Table form implemented in React. Table is generated from **dane.json** file and 
 Currently implemented features:
   * pagination with editable amount of items per page
   * sorting each column ascending or descending by clicking its heading
-  * filtereing data (not working properly yet)
+  * filtering data
