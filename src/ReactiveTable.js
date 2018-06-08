@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faArrowUp from '@fortawesome/fontawesome-free-solid/faArrowUp';
-import faArrowDown from '@fortawesome/fontawesome-free-solid/faArrowDown';
-import './ReactiveTable.css';
+import './css/ReactiveTable.css';
 
 const ReactiveTableItem = (props) => {
   return <tr>{props.columnNames.map(item => <td>{props.data[item.key]}</td>)}</tr>
@@ -16,78 +13,81 @@ class ReactiveTable extends Component {
       filteredDataSet: this.props.allDataSet,
       sortedDataSet: this.props.allDataSet,
       paginatedDataSet: [],
-      itemsPerPage: 6,
+      itemsPerPage: 10,
       currentPage: 1,
-      sortDirection: 'ascending',
+      sortDirection: 'descending',
       sortedColumn: this.props.defaultSortParam,
-      isArrowUpHidden: [true, true],
-      isArrowDownHidden: [true, true],
+      filteredColumnChange: ''
     }
   }
 
-  sortData = (key, isFirstSort) => {
-    let tmpData = this.state.currentDataSet;
-    let type = this.props.columnNames.find(item => item.key == key)["type"];
-    switch (type) {
-      case "number":
-        if (this.state.sortDirection === 'descending' || isFirstSort) {
-          tmpData.sort((a, b) => (a.age - b.age));
-          this.setState({ sortDirection: 'ascending' });
-        }
-        else {
-          if(this.state.sortedColumn !== key){
-            tmpData.sort((a,b) => (a.age - b.age));
-            this.setState({ sortDirection: 'ascending' });
-          } else {
-            this.reverseSorting(tmpData);
-          }
-        }
-        this.toggleArrow(1);
-        break;
-      case "string":
-        if (this.state.sortDirection === 'descending' || isFirstSort) {
-          tmpData.sort((a, b) => a["name"].localeCompare(b["name"]));
-          this.setState({ sortDirection: 'ascending' });
-        }
-        else {
-          if(this.state.sortedColumn !== key) {
-            tmpData.sort((a, b) => a["name"].localeCompare(b["name"]));
-            this.setState({ sortDirection: 'ascending' });
-          } else {
-            this.reverseSorting(tmpData);
-          }
-        }
-        this.toggleArrow(0);
-        break;
-      case "date":
-        if (this.state.sortDirection === 'descending') {
-          tmpData.sort((a, b) => (a.date - b.date));
-          this.setState({ sortDirection: 'ascending' });
-        }
-        else {
-          this.reverseSorting(tmpData);
-        }
-        break;
-      default:
-        alert("This should never happen XD");
+  toggleSortDirection = (direction) => {
+    if (direction === "ascending") return "descending"
+    return "ascending"
+  }
+
+  filterData = (key, event) => {
+    let tmpData;
+    if(this.state.filteredColumnChange === '' || this.state.filteredColumnChange === key){
+      tmpData = this.state.currentDataSet;
+    } else{
+      tmpData = this.state.filteredDataSet;
     }
-    this.setState({ sortedColumn: key });
-    this.setState({ sortedDataSet: tmpData });
+    tmpData = tmpData.filter((item) => {
+        if(item[key].toLowerCase().includes(event.target.value)) {
+          return  item[key];
+        }
+    });
+    this.setState({filteredColumn: key});
+    this.setState({filteredDataSet: tmpData});
+    this.setState({sortedDataSet: tmpData});
     this.paginateData();
   }
 
-  reverseSorting = (data) => {
-    data.reverse();
-    this.setState({ sortDirection: 'descending' });
-  }
-
-  toggleArrow = (index) => {
-    if (this.state.sortDirection === "ascending") {
-      this.toggleArrowUpHidden(index);
+  sortData = (key, isFirstSort) => {
+    let tmpData = this.state.filteredDataSet;
+    let newSortDirection = this.state.sortedColumn === key ? this.toggleSortDirection(this.state.sortDirection) : "ascending";
+    let type = this.props.columnNames.find(item => item.key == key)["type"];
+    switch (type) {
+      case "number":
+        if (newSortDirection === 'ascending' || isFirstSort) {
+          tmpData.sort((a, b) => (a[key] - b[key]));
+        }
+        else {
+          if (this.state.sortedColumn !== key) {
+            tmpData.sort((a, b) => (a[key] - b[key]));
+          } else {
+            tmpData.reverse();
+          }
+        }
+        break;
+      case "string":
+        if (newSortDirection === 'ascending' || isFirstSort) {
+          tmpData.sort((a, b) => a[key].localeCompare(b[key]));
+        }
+        else {
+          if (this.state.sortedColumn !== key) {
+            tmpData.sort((a, b) => a[key].localeCompare(b[key]));
+          } else {
+            tmpData.reverse();
+          }
+        }
+        break;
+      case "date":
+        if (newSortDirection === 'ascending') {
+          tmpData.sort((a, b) => (a.unix_date - b.unix_date));
+        }
+        else {
+          tmpData.reverse();
+        }
+        break;
+      default:
+        alert("Type was not recognized");
     }
-    else if (this.state.sortDirection === "descending") {
-      this.toggleArrowDownHidden(index);
-    }
+    this.setState({sortDirection: newSortDirection})
+    this.setState({ sortedColumn: key });
+    this.setState({ sortedDataSet: tmpData });
+    this.paginateData();
   }
 
   paginateData = () => {
@@ -111,47 +111,39 @@ class ReactiveTable extends Component {
     this.paginateData();
   }
 
-  filterData = (keyword) => {
-    this.setState({ filteredDataSet: this.state.filteredDataSet.filter((keyword, index) => this.props.allDataSet.lastIndexOf(keyword) === index) });
-  }
-
-  toggleArrowUpHidden(index) {
-    let newState = this.state.isArrowUpHidden.slice();
-    newState[index] = !this.state.isArrowUpHidden[index];
-    this.setState({
-      isArrowUpHidden: newState
-    })
-  }
-
-  toggleArrowDownHidden(index) {
-    let newState = this.state.isArrowDownHidden.slice();
-    newState[index] = !this.state.isArrowDownHidden[index];
-    this.setState({
-      isArrowDownHidden: newState
-    })
-  }
-
   componentDidMount() {
-    this.sortData(this.props.defaultSortParam, true);
+    if (this.props.defaultSortParam) {
+      this.sortData(this.props.defaultSortParam, true);
+    }
     this.paginateData();
+  }
+
+  getArrow = (direction) => {
+    if (direction == "ascending")
+      return <i className="fa fa-arrow-up" />
+    else
+      return <i className="fa fa-arrow-down" />
   }
 
   render() {
 
     return (
       <div className="wrapper">
-        <table className="items">
-          <thead>
-            <tr>{this.props.columnNames.map((item, index) => <th onClick={() => { this.sortData(item.key, false) }}>{!this.state.isArrowUpHidden[index] && <FontAwesomeIcon icon={faArrowUp} />}{!this.state.isArrowDownHidden[index] && <FontAwesomeIcon icon={faArrowDown} />}{item.label}</th>)}</tr>
+        <table className={this.props.defaultStyle && this.props.defaultStyle.table}>
+          <thead className={this.props.defaultStyle && this.props.defaultStyle.thead}>
+            <tr>{this.props.columnNames.map((item, index) => <th onClick={() => { this.sortData(item.key, false) }}>
+              {item.label}{this.state.sortedColumn == item.key && this.getArrow(this.state.sortDirection)}</th>)}</tr>
           </thead>
-          <tbody>
+          <tfoot className={this.props.defaultStyle && this.props.defaultStyle.tbody}>
+            <tr>{this.props.columnNames.map((item, index) => <th><input  style={{display: 'table', width: '80%', display: 'flex'}} onChange={(event) => {this.filterData(item.key, event)}}></input></th>)}</tr>
+          </tfoot>
+          <tbody className={this.props.defaultStyle && this.props.defaultStyle.tbody}>
             {this.state.paginatedDataSet.map(item => <ReactiveTableItem data={item}
               columnNames={this.props.columnNames} />)}
-            <tr>{this.props.columnNames.map(item => <input type="text" placeholder="Filter column" onChange={() => { this.filterData("a") }}></input>)}</tr>
           </tbody>
         </table>
-        <button onClick={this.goToNextPage}>Next page</button>
         <button onClick={this.goToPreviousPage}>Previous page</button>
+        <button onClick={this.goToNextPage}>Next page</button>
       </div>
     );
   }
